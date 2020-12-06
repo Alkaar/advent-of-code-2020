@@ -1,6 +1,5 @@
 import scala.io.Source
-import scala.util
-import scala.util.{Failure, Success, Try}
+import scala.util.Try
 
 object Day04 {
 
@@ -13,7 +12,7 @@ object Day04 {
     val input = Source.fromResource("day04.txt").getLines
 
     Iterator
-      .continually(input.takeWhile(_.length != 0).mkString(" "))
+      .continually(input.takeWhile(_.nonEmpty).mkString(" "))
       .takeWhile(_.nonEmpty)
       .map {
         val validFields = Seq("byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid")
@@ -60,7 +59,7 @@ object Day04 {
     val input = Source.fromResource("day04.txt").getLines
 
     Iterator
-      .continually(input.takeWhile(_.length != 0).mkString(" "))
+      .continually(input.takeWhile(_.nonEmpty).mkString(" "))
       .takeWhile(_.nonEmpty)
       .map {
         val validFields = Seq("byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid")
