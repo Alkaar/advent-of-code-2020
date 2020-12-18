@@ -10,25 +10,38 @@ object Day18 {
     println(s"Second answer: ${solutionTwo}")
   }
 
-  val toolbox = currentMirror.mkToolBox()
+  def changePrecedence(expr: String, operators: List[Char]): String = {
+    val ops = operators.foldLeft("")(_ + _)
+
+    val fixOps = operators.map { op => s: String =>
+      s.replace(s""" ${op} (""", s""".${op}(""")
+    }
+
+    val wrapNumsInParens = new Regex(s""" ([${ops}]) (\\d+)""", "operator", "int")
+      .replaceAllIn(expr, m => s".${m.group("operator")}(${m.group("int")})")
+
+    val wrapSubExprInParens = fixOps
+      .foldLeft(wrapNumsInParens) {
+        case (newExpr, fixOps) => fixOps(newExpr)
+      }
+
+    new Regex("""(\d+)""", "int").replaceAllIn(wrapSubExprInParens, m => s"${m.group("int")}L")
+  }
+
+  def runExpr(stringExpr: String, operators: List[Char]): Long = {
+    val toolbox = currentMirror.mkToolBox()
+
+    val expr = toolbox.parse(changePrecedence(stringExpr, operators))
+
+    toolbox.compile(expr)().asInstanceOf[Long]
+  }
 
   def solutionOne: Long = {
     val input = Source.fromResource("day18.txt").getLines
 
     input.foldLeft(0L) {
       case (sum, stringExpr) => {
-        val newExpr =
-          new Regex(""" ([+*]) (\d+)""", "operator", "int")
-            .replaceAllIn(stringExpr, m => s".${m.group("operator")}(${m.group("int")})")
-            .replace(" + (", ".+(")
-            .replace(" * (", ".*(")
-
-        val newLongExpr =
-          new Regex("""(\d+)""", "int").replaceAllIn(newExpr, m => s"${m.group("int")}L")
-
-        val expr = toolbox.parse(newLongExpr)
-
-        sum + toolbox.compile(expr)().asInstanceOf[Long]
+        sum + runExpr(stringExpr, List('+', '*'))
       }
     }
   }
@@ -37,17 +50,7 @@ object Day18 {
     val input = Source.fromResource("day18.txt").getLines
     input.foldLeft(0L) {
       case (sum, stringExpr) => {
-        val newExpr =
-          new Regex(""" \+ (\d+)""", "int")
-            .replaceAllIn(stringExpr, m => s".+(${m.group("int")})")
-            .replace(" + (", ".+(")
-
-        val newLongExpr =
-          new Regex("""(\d+)""", "int").replaceAllIn(newExpr, m => s"${m.group("int")}L")
-
-        val expr = toolbox.parse(newLongExpr)
-
-        sum + toolbox.compile(expr)().asInstanceOf[Long]
+        sum + runExpr(stringExpr, List('+'))
       }
     }
   }
