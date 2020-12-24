@@ -1,7 +1,9 @@
 *.class
 *.log
 *.xml
+.bsp
 .idea
 .DS_Store
 /project
+/root
 /target
